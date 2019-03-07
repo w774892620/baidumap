@@ -1,0 +1,91 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $operation == 'display'} class="active" {/if}>
+		<a href="{php echo $this->createWebUrl('map',array('op' =>'display'))}">门店列表</a>
+	</li>
+	<li{if $operation == 'post' && empty($map['id'])} class="active" {/if}>
+		<a href="{php echo $this->createWebUrl('map',array('op' =>'post'))}">添加门店</a>
+	</li>
+	{if !empty($map['id']) && $operation== 'post'} 
+		<li class="active">
+			<a href="{php echo $this->createWebUrl('map',array('op' =>'post','id'=>$map['id']))}">编辑门店</a>
+		</li> 
+	{/if}
+</ul>
+{if $operation == 'display'}
+	<div class="main panel panel-default">
+		<div class="panel-body table-responsive">
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th style="width:30px;">ID</th>
+						<th style="width:200px;">门店名称</th>
+						<th style="width:300px;">门店地址</th>
+						<th style="width:300px;">经纬度</th>
+						<th style="width:120px;">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{loop $list $item}
+					<tr>
+						<td>{$item['id']}</td>
+						<td>{$item['store']}</td>
+						<td>{$item['address']}</td>
+						<td>{$item['longitude']},{$item['latitude']}</td>
+						<td style="text-align:left;">
+							<a href="{php echo $this->createWebUrl('map', array('op' => 'post', 'id' => $item['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="修改"><i class="fa fa-pencil"></i></a>
+							<a href="{php echo $this->createWebUrl('map', array('op' => 'delete', 'id' => $item['id']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="删除"><i class="fa fa-times"></i></a>
+						</td>
+					</tr>
+					{/loop}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<script>
+	   //编辑和删除的hover效果,在按钮下方显示文字
+		require(['bootstrap'],function($){
+			$('.btn').hover(function(){
+				$(this).tooltip('show');
+			},function(){
+				$(this).tooltip('hide');
+			});
+		});
+	</script>
+	{elseif $operation == 'post'}
+		<div class="main">
+			<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+				<input type="hidden" name="id" value="{$map['id']}" />
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						分类设置
+					</div>
+					<div class="panel-body">
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">门店名称</label>
+							<div class="col-sm-9 col-xs-12">
+								<input type="text"  name="store" class="form-control" value="{$map['store']}" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">门店地址</label>
+							<div class="col-sm-9 col-xs-12">
+								<input type="text" name="address" class="form-control" value="{$map['address']}" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">经度</label>
+							<div class="col-sm-9 col-xs-12"> 
+								{php echo tpl_form_field_coordinate('baidumap', array('lng'=>$map['longitude'],'lat'=>$map['latitude']))}
+							</div>
+						</div>
+					</div>
+				</div>
+			<div class="form-group col-sm-12">
+				<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+			</form>
+		</div>
+{/if}
+{template 'common/footer'}
